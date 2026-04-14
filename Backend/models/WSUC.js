@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const wsucSchema = new mongoose.Schema({
     WSUC_ID: { type: Number, unique: true },
-    WSUC_Name: { type: String, unique: true },
+    WSUC_Name: { type: String },
 
 
     Location: {
@@ -10,7 +10,7 @@ const wsucSchema = new mongoose.Schema({
         District_Name: { type: String },
         Municipality_Type: { type: String },
         Municipality_Name: { type: String },
-        Wards_Covered: { type: Number },
+        Wards_Covered: { type: Array },
     },
 
     Service_Coverage_Prerequisite: { type: String },

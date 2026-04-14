@@ -3,70 +3,102 @@ const xlsx = require('xlsx')
 const path = require("path")
 
 const extractData = () => {
-    // Reading excel file
-    const filePath = path.join(__dirname, '../dummy.xlsx')
 
+    const filePath = path.join(__dirname, '../DWSSM_KPI_GIS_Ready.xlsx')
     const workbook = xlsx.readFile(filePath)
 
-    // First Phase: Reading the Spatial Data
+    let WSUCData = {}
+
+    // Spatial Data (BASE)
     const Spatial_sheet = workbook.Sheets['Spatial']
     const Spatial_data = xlsx.utils.sheet_to_json(Spatial_sheet)
 
-    let WSUCData = {}
     Spatial_data.forEach((row) => {
         WSUCData[row.WSUC_ID] = {
             WSUC_ID: row.WSUC_ID,
             WSUC_Name: row.WSUC_Name,
 
             Location: {
-                Province_Name: row.Province_Name,
-                District_Name: row.District_Name,
-                Municipality_Type: row.Municipality_Type,
-                Municipality_Name: row.Municipality_Name,
-                Wards_Covered: row.Wards_Covered,
+                Province_Name: row.Province_Name || null,
+                District_Name: row.District_Name || null,
+                Municipality_Type: row.Municipality_Type || null,
+                Municipality_Name: row.Municipality_Name || null,
+                Wards_Covered: row.Wards_Covered || null,
             },
-            Service_Coverage_Prerequisite: "",
+
+            Service_Coverage_Prerequisite: null,
             Summary_Index: {}
         }
     })
 
-    // Second Phase: Reading the Service Coverage Prerequisite
-
+    // Service coverage
     const Service_Coverage_Sheet = workbook.Sheets['Service Coverage']
     const Service_Coverage_data = xlsx.utils.sheet_to_json(Service_Coverage_Sheet)
 
-    Service_Coverage_data.map((row) => {
+    Service_Coverage_data.forEach((row) => {
         if (WSUCData[row.WSUC_ID]) {
-            WSUCData[row.WSUC_ID].Service_Coverage_Prerequisite = row['Prerequisite: Does Business Plan exist?']
+            WSUCData[row.WSUC_ID].Service_Coverage_Prerequisite =
+                row['Prerequisite: Does Business Plan exist?'] || null
         }
     })
 
-
-    // Third Phase: Reading the Summary index Data
     const Summary_Index_Sheet = workbook.Sheets['Summary_Index']
-    const Summary_Index_Data = xlsx.utils.sheet_to_json(Summary_Index_Sheet)
 
-    Summary_Index_Data.forEach((row) => {
-        if (WSUCData[row.WSUC_ID]) {
-            WSUCData[row.WSUC_ID].Summary_Index = {
-                Service_Coverage_Score: row.Coverage_Score,
-                Adequacy_Score: row.Adequacy_Score,
-                Water_Quality_Score: row.Water_Quality,
-                Reliability_Score: row.Reliability_Score,
-                NRW_Score: row.NRW_Score,
-                OM_Score: row.O_and_M_Score,
-                Metering_Ratio_Score: row.Metering_Score,
-                Grievance_Score: row.Grievance_Score,
-                SPI: row.SPI,
-                OEI: row.OEI,
-                CWPI_Percentage: row.CWPI_Percentage,
-                CWPI_Interpretation: row.CWPI_Interpretation,
-                Type_A_to_D: row.Type_A_to_D,
+    // A5 → A72 (WSUC IDs)
+    const idRange = {
+        s: { r: 4, c: 0 },
+        e: { r: 71, c: 0 }
+    }
+
+    const ids = xlsx.utils.sheet_to_json(Summary_Index_Sheet, {
+        range: idRange,
+        header: 1
+    }).map(row => row[0])
+
+    // Full data (skip top junk rows)
+    const Summary_Index_Data = xlsx.utils.sheet_to_json(Summary_Index_Sheet, {
+        range: 3,
+        defval: null
+    })
+
+    const cleanNumber = (val) => {
+        if (val === null || val === undefined || val === "") return null
+
+        if (typeof val === "number") return val
+
+        const num = parseFloat(String(val).replace(/[^\d.]/g, ""))
+        return isNaN(num) ? null : num
+    }
+
+
+    Summary_Index_Data.forEach((row, index) => {
+
+        const wsucId = ids[index]
+
+        if (WSUCData[wsucId]) {
+            WSUCData[wsucId].Summary_Index = {
+
+                Service_Coverage_Score: cleanNumber(row['Service\r\nCoverage\r\n(wt 0.25)'] || null),
+                Adequacy_Score: cleanNumber(row['Adequacy\r\n(wt 0.20)'] || null),
+                Water_Quality_Score: cleanNumber(row['Water\r\nQuality\r\n(wt 0.35)'] || null),
+                Reliability_Score: cleanNumber(row['Reliability\r\n(wt 0.20)'] || null),
+                NRW_Score: cleanNumber(row['NRW\r\n(wt 0.30)'] || null),
+                OM_Score: cleanNumber(row['O&M Ratio\r\n(wt 0.25)']),
+                Metering_Ratio_Score: cleanNumber(row['Metering\r\n(wt 0.20)'] || null),
+                Grievance_Score: cleanNumber(row['Grievance\r\n(wt 0.25)'] || null),
+
+                SPI: cleanNumber(row['SPI\r\n(%)'] || null),
+                OEI: cleanNumber(row['OEI\r\n(%)'] || null),
+
+                // Optional fields (keep as string)
+                CWPI_Percentage: row.CWPI_Percentage || null,
+                CWPI_Interpretation: row.CWPI_Interpretation || null,
+                Type_A_to_D: row.Type_A_to_D || null,
             }
         }
     })
 
-    return WSUCData;
+    return WSUCData
 }
 
 module.exports = { extractData }

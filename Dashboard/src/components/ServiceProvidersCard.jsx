@@ -42,24 +42,29 @@ const ServiceProvidersCard = ({ data }) => {
                 </div>
               </div>
 
-              <h3 className="text-2xl font-black text-white mb-6 uppercase tracking-tight flex items-center gap-3">
-                {item.WSUC_Name}
-                <span className="text-lg">
-                  {item.Summary_Index.CWPI_Percentage > 80
+              <h3
+                className={`text-2xl font-black text-white mb-6 uppercase tracking-tight flex items-center gap-3 
+                          ${!isExpanded ? "truncate block" : "flex-wrap"}`}
+              >
+                <span className={!isExpanded ? "truncate" : ""}>
+                  {item.WSUC_Name}
+                </span>
+
+                <span className="text-lg shrink-0">
+                  {item.Summary_Index?.SPI?.toFixed(2) > 80
                     ? "🟢"
-                    : item.Summary_Index.CWPI_Percentage >= 70
+                    : item.Summary_Index?.SPI?.toFixed(2) >= 70
                     ? "🟡"
                     : "🔴"}
                 </span>
               </h3>
-
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-[10px] font-black text-blue-200/50 uppercase tracking-widest">
-                    CWPI Progress
+                    SPI Progress
                   </p>
                   <p className="text-4xl font-black text-white">
-                    {item.Summary_Index.CWPI_Percentage.toFixed(2)}%
+                    {item.Summary_Index?.SPI?.toFixed(2)}%
                   </p>
                 </div>
                 <div className="text-blue-400 font-bold text-sm">
@@ -93,17 +98,17 @@ const ServiceProvidersCard = ({ data }) => {
                     />
                     <InfoBox
                       label="Wards Covered"
-                      value={item.Location.Wards_Covered}
+                      value={item.Location?.Wards_Covered}
                     />
 
                     {/* Metrics */}
                     <InfoBox
                       label="SPI Score"
-                      value={item.Summary_Index.SPI.toFixed(2)}
+                      value={item.Summary_Index?.SPI?.toFixed(2)}
                     />
                     <InfoBox
                       label="OEI Score"
-                      value={item.Summary_Index.OEI.toFixed(2)}
+                      value={item.Summary_Index?.OEI?.toFixed(2)}
                     />
 
                     {/* Interpretation - Full Width */}
@@ -112,7 +117,22 @@ const ServiceProvidersCard = ({ data }) => {
                         Interpretation
                       </p>
                       <p className="text-sm font-medium text-blue-100">
-                        {item.Summary_Index.CWPI_Interpretation}
+                        {item.Summary_Index?.SPI >= 95
+                          ? "Highly Efficient"
+                          : item.Summary_Index?.SPI >= 90
+                          ? "Moderately Efficient"
+                          : item.Summary_Index?.SPI >= 80
+                          ? "Just Efficient"
+                          : item.Summary_Index?.SPI >= 70 &&
+                            item.Summary_Index?.SPI <= 79
+                          ? "Improved"
+                          : item.Summary_Index?.SPI >= 50 &&
+                            item.Summary_Index?.SPI <= 69
+                          ? "Improving"
+                          : item.Summary_Index?.SPI < 50 &&
+                            item.Summary_Index?.SPI >= 30
+                          ? "Poor"
+                          : "Very Poor"}
                       </p>
                     </div>
                   </div>

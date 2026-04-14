@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion"; // Imported for smoothness
 import ServiceProvidersCard from "../components/ServiceProvidersCard";
 import SideBar from "../components/SideBar";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -6,7 +7,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 const ServiceProvidersDashboard = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getData() {
@@ -30,19 +31,16 @@ const ServiceProvidersDashboard = () => {
       } catch (error) {
         console.log("Error at service Provider dashboard \n", error);
       } finally {
-        setLoading(false); // Stop loading regardless of success or error
+        setLoading(false);
       }
     }
     getData();
   }, []);
 
   return (
-    // Main wrapper with your specific Royal Blue background
     <div className="flex bg-[#1E3A8A] min-h-screen w-full overflow-hidden">
-      {/* 1. Sidebar Component */}
       <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
-      {/* 2. Main Content Area */}
       <main
         className={`flex-1 transition-all duration-300 overflow-y-auto h-screen p-6 md:p-10 ${
           isOpen ? "md:ml-0" : ""
@@ -58,20 +56,40 @@ const ServiceProvidersDashboard = () => {
             </p>
           </header>
 
-          {/* Conditional Rendering */}
-          {loading ? (
-            <div className="flex items-center justify-center h-[60vh]">
-              <LoadingSpinner />
-            </div>
-          ) : data.length > 0 ? (
-            <ServiceProvidersCard data={data} />
-          ) : (
-            <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/10">
-              <p className="text-blue-200 font-bold">
-                No service provider data found.
-              </p>
-            </div>
-          )}
+          {/* AnimatePresence ensures that items exiting the DOM animate smoothly */}
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.div
+                key="loader"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center justify-center h-[60vh]"
+              >
+                <LoadingSpinner />
+              </motion.div>
+            ) : data.length > 0 ? (
+              <motion.div
+                key="content"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                <ServiceProvidersCard data={data} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20 bg-white/5 rounded-3xl border border-white/10"
+              >
+                <p className="text-blue-200 font-bold">
+                  No service provider data found.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
     </div>

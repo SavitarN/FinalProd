@@ -8,6 +8,7 @@ import {
   Briefcase,
   Database,
   FileText,
+  ChartBar,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -43,6 +44,7 @@ const SideBar = ({ isOpen, setIsOpen }) => {
       path: "/research",
     },
     { name: "Downloads", icon: <FileText size={20} />, path: "/downloads" },
+    { name: "Chart", icon: <ChartBar size={20} />, path: "/chart" },
   ];
 
   return (
