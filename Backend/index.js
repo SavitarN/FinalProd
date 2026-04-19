@@ -9,9 +9,6 @@ const getData = require('./routes/getDataRoute')
 const getWards = require('./routes/getWardRoute')
 const getDistricts = require('./routes/getDistrictRoute')
 
-//Imported mistral routes
-const getResponse = require('./routes/mistralRoutes/mistralRoutes')
-
 
 // Library imports
 const express = require('express')
@@ -33,8 +30,6 @@ app.use('/data', saveData, getData)
 //Map Routes
 app.use('/map', getWards, getDistricts)
 
-//Mistral ai routes
-app.use('/ai', getResponse)
 
 //Server Running
 app.listen(process.env.PORT, () => {
