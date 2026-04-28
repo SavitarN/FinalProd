@@ -1,6 +1,7 @@
 require("dotenv").config();
 //Imported File for database
 require("./database/connection");
+const PORT = process.env.PORT || 5000;
 
 // Imported files for saveData and getData for excell file
 const saveData = require("./routes/saveDataRoute");
@@ -14,7 +15,6 @@ const getDistricts = require("./routes/getDistrictRoute");
 const express = require("express");
 const cors = require("cors");
 const status = require("express-status-monitor");
-require("dotenv").config({ quiet: true });
 
 //Object Initilization
 const app = express();
@@ -31,6 +31,7 @@ app.use("/data", saveData, getData);
 app.use("/map", getWards, getDistricts);
 
 //Server Running
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
