@@ -61,7 +61,9 @@ const Chart = () => {
     async function getData() {
       try {
         setLoading(true);
-        const req = await fetch("http://localhost:3000/data/getData");
+        const req = await fetch(
+          "https://dashboard-backend-nbt7.onrender.com/map/getData",
+        );
         const res = await req.json();
         if (req.ok && res.data) {
           // Process data: filter items that have actual coordinates
@@ -69,7 +71,7 @@ const Chart = () => {
             .filter(
               (item) =>
                 item?.Summary_Index?.OEI !== null &&
-                item?.Summary_Index?.SPI !== null
+                item?.Summary_Index?.SPI !== null,
             )
             .map((item) => ({
               ...item,

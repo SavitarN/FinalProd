@@ -7,7 +7,9 @@ const MapDataLayer = () => {
   useEffect(() => {
     const loadAllWards = async () => {
       try {
-        const response = await fetch("http://localhost:3000/map/getWards");
+        const response = await fetch(
+          "https://dashboard-backend-nbt7.onrender.com/map/getWards",
+        );
         const data = await response.json();
         setGeoData(data);
       } catch (error) {
@@ -25,8 +27,8 @@ const MapDataLayer = () => {
         val > 500
           ? "#065f46" // Dark Emerald
           : val > 200
-          ? "#10b981" // Emerald
-          : "#a7f3d0", // Light Emerald
+            ? "#10b981" // Emerald
+            : "#a7f3d0", // Light Emerald
       weight: 0.5,
       opacity: 1,
       color: "white",

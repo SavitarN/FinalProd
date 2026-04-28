@@ -13,12 +13,15 @@ const ServiceProvidersDashboard = () => {
     async function getData() {
       try {
         setLoading(true);
-        const req = await fetch("http://localhost:3000/data/getData", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
+        const req = await fetch(
+          "https://dashboard-backend-nbt7.onrender.com/map/getWardsgetData",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
 
         const res = await req.json();
         if (req.ok) {
