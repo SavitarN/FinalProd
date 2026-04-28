@@ -14,7 +14,7 @@ const ServiceProvidersDashboard = () => {
       try {
         setLoading(true);
         const req = await fetch(
-          "https://dashboard-backend-nbt7.onrender.com/map/getWardsgetData",
+          "https://dashboard-backend-nbt7.onrender.com/map/getData",
           {
             method: "GET",
             headers: {
